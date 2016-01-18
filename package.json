@@ -1,0 +1,27 @@
+{
+  "name": "podqueue-api",
+  "version": "1.0.0",
+  "description": "The service for the podqueue.com service",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "standard && jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxpolun.com/podqueue-api.git"
+  },
+  "keywords": [
+    "podcast",
+    "api",
+    "rss",
+    "server"
+  ],
+  "author": "Max Polun <maxpolun@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maxpolun.com/podqueue-api/issues"
+  },
+  "homepage": "https://github.com/maxpolun.com/podqueue-api#readme"
+}
