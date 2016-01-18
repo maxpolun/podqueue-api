@@ -1,7 +1,7 @@
 Deploy Guide
 ============
 
-podqueue-api should be able to be deployed anywhere that node supports. It requires the following environmental variables:
+podqueue-api should be able to be deployed to any unix-like system. It requires the following environmental variables:
 
 * DATABASE_URL: The connection string to the postgres database.
 * NODE_ENV: should be 'production' for production deploys
