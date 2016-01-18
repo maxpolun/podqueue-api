@@ -11,7 +11,7 @@ Podcast object:
   {
     name: 'name of podcast',
     description: 'an optional description of the podcast',
-    feed: 'the feed url',
+    feedUrl: 'the feed url',
     episodesUrl: 'the url to get the episodes of the podcast (only in GET)'
   }
 
@@ -26,6 +26,9 @@ Episode object:
     podcastUrl: 'url of podcast in podqueue-api',
     episodeUrl: 'the url of the episode in podqueue-api',
     fileUrl: 'the url to download the podcast episode audio file',
+    fileLength: 12345 // length of episode file in bytes,
+    fileDuration: 'HH:mm:ss playtime of episode as string',
+    fileFormat: 'audio/mpeg MIME-type of the file',
     name: 'episode name',
     description: 'episode description',
     releasedAt: 'the datetime of the episode release'
