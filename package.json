@@ -21,7 +21,10 @@
     "start": "node index.js",
     "watch": "nodemon",
     "watch-tests": "nodemon --exec 'npm test'",
-    "migrate": "db-migrate up"
+    "migrate": "db-migrate up",
+    "migrate-down": "db-migrate down",
+    "db-reset": "db-migrate reset",
+    "new-migration": "db-migrate create --sql-file"
   },
   "repository": {
     "type": "git",
