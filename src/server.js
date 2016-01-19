@@ -6,6 +6,8 @@ let koaBody = require('koa-body')()
 
 let dbMiddleware = require('./middlewares/db')
 
+let config = require('./config/config')
+
 router.get('/', koaBody, function * () {
   this.body = (yield this.db.query('SELECT * FROM users')).rows
 })
@@ -13,8 +15,8 @@ router.get('/', koaBody, function * () {
 let app = koa()
 
 app.use(koaLogger())
-    .use(dbMiddleware(process.env.DATABASE_URL || 'postgres://podqueue@localhost/podqueue-dev'))
+    .use(dbMiddleware(config.dbUrl))
     .use(router.routes())
     .use(router.allowedMethods())
 
-app.listen(4000, () => console.log('starting on port 4000'))
+app.listen(config.port, () => console.log(`starting on port ${config.port}`))
