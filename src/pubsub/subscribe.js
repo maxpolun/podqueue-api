@@ -5,10 +5,10 @@ let url = require('url')
 let encode = require('form-urlencoded')
 let config = require('../config/config.js')
 
-function post(hubUrl, form) {
+function post (hubUrl, form) {
   return new Promise((resolve, reject) => {
     let body = encode(form)
-    let parsed = url.parse(hubUrl);
+    let parsed = url.parse(hubUrl)
     let defaultConfig = {
       method: 'POST',
       headers: {
