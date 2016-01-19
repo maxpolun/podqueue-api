@@ -8,6 +8,8 @@ let dbMiddleware = require('./middlewares/db')
 
 let config = require('./config/config')
 
+require('./pubsub').listener(router)
+
 router.get('/', koaBody, function * () {
   this.body = (yield this.db.query('SELECT * FROM users')).rows
 })

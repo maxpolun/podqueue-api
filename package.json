@@ -5,6 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "db-migrate": "^0.9.23",
+    "feedparser": "^1.1.4",
+    "form-urlencoded": "^1.1.9",
     "koa": "^1.1.2",
     "koa-body": "^1.4.0",
     "koa-logger": "^1.3.0",
