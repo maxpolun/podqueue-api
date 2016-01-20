@@ -19,7 +19,7 @@
     "standard": "^5.4.1"
   },
   "scripts": {
-    "test": "standard && jasmine",
+    "test": "epr && standard && jasmine",
     "start": "node index.js",
     "watch": "nodemon",
     "watch-tests": "nodemon --exec 'npm test'",
@@ -47,6 +47,17 @@
   "standard": {
     "ignore": [
       "migrations/"
+    ],
+    "global": [
+      "describe",
+      "it",
+      "expect",
+      "jasmine",
+      "beforeEach",
+      "afterEach"
     ]
+  },
+  "epr": {
+    "src": "src"
   }
 }

@@ -19,7 +19,7 @@ function post (hubUrl, form) {
     let config = Object.assign({}, defaultConfig, parsed)
 
     let request = http.request(config, response => {
-      if (response.statusCode >= 400) reject(response)
+      if (response.statusCode >= 400) reject(response.statusCode)
 
       resolve()
     })
@@ -30,9 +30,13 @@ function post (hubUrl, form) {
   })
 }
 
-module.exports = function subscribe (hubUrl, topicUrl, podcastUuid) {
-  post(hubUrl, {
-    'hub.callback': config.baseUrl + '/subscriptions/#{podcastUuid}',
+module.exports = function subscribe (options) {
+  let hubUrl, topicUrl, podcastUuid
+  hubUrl = options.hubUrl
+  topicUrl = options.topicUrl
+  podcastUuid = options.podcastUuid
+  return post(hubUrl, {
+    'hub.callback': config.baseUrl + `/subscriptions/${podcastUuid}`,
     'hub.mode': 'subscribe',
     'hub.topic': topicUrl
   })
