@@ -8,10 +8,11 @@ let parse = require('url').parse
 let koaLogger = require('koa-logger')
 
 class PubSubServer {
-  constructor (port) {
+  constructor (port, shouldLog) {
     this.port = port
     this.server = null
     this.subscriptions = []
+    this.shouldLog = shouldLog || false
   }
 
   start () {
@@ -22,7 +23,7 @@ class PubSubServer {
   createApp () {
     let app = koa()
     app.use(koaBody())
-    app.use(koaLogger())
+    if (this.shouldLog) app.use(koaLogger())
 
     let self = this
 
