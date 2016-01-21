@@ -2,10 +2,8 @@
 // a simple pubsubhubbub server built for testing
 let koa = require('koa')
 let koaBody = require('koa-body')
-let http = require('http')
-let querystring = require('querystring')
-let parse = require('url').parse
 let koaLogger = require('koa-logger')
+let http = require('src/support/http')
 
 class PubSubServer {
   constructor (port, shouldLog) {
@@ -72,7 +70,7 @@ class PubSubServer {
   verifySubs (challenge, leaseSeconds) {
     leaseSeconds = leaseSeconds || 4000
     return Promise.all(this.subscriptions.filter(sub => !sub.verified).map(sub => {
-      return this.get(sub.callback, {
+      return http.get(sub.callback, {
         'hub.mode': 'subscribe',
         'hub.topic': sub.topic,
         'hub.challenge': challenge,
@@ -87,35 +85,8 @@ class PubSubServer {
 
   updateTopic (topic, content) {
     return Promise.all(this.subscriptions.filter(sub => sub.topic === topic).map(sub => {
-      return this.post(sub.callback, content)
+      return http.post(sub.callback, content)
     }))
-  }
-
-  get (url, params) {
-    return new Promise((resolve, reject) => {
-      let query = querystring.stringify(params)
-      http.get(url + '?' + query, res => {
-        let str = ''
-        res.on('data', chunk => str += chunk.toString())
-        res.on('end', () => resolve(str))
-        res.on('error', err => reject(err))
-      }).on('error', err => reject(err))
-    })
-  }
-
-  post (url, body) {
-    return new Promise((resolve, reject) => {
-      let parsed = parse(url)
-      let config = Object.assign({}, {
-        method: 'POST'
-      }, parsed)
-      let req = http.request(config, res => {
-        res.on('end', () => resolve())
-      })
-      req.on('error', err => reject(err))
-      req.write(body)
-      req.end()
-    })
   }
 }
 
