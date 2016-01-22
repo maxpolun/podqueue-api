@@ -3,5 +3,10 @@
     "driver": "pg",
     "user": "podqueue",
     "database": "podqueue-dev"
+  },
+  "test": {
+    "driver": "pg",
+    "user": "podqueue",
+    "database": "podqueue-test"
   }
 }

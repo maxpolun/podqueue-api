@@ -9,7 +9,10 @@ function get (url, params) {
     http.get(url + '?' + query, res => {
       let str = ''
       res.on('data', chunk => str += chunk.toString())
-      res.on('end', () => resolve(str))
+      res.on('end', () => {
+        res.body = str
+        resolve(res)
+      })
       res.on('error', err => reject(err))
     }).on('error', err => reject(err))
   })

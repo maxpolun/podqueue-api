@@ -7,3 +7,4 @@ set -e
 
 createuser -s podqueue
 createdb -E UTF8 -O podqueue podqueue-dev
+createdb -E UTF8 -O podqueue podqueue-test

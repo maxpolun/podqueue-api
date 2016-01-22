@@ -1,4 +1,5 @@
 'use strict'
+
 let koa = require('koa')
 let koaLogger = require('koa-logger')
 let router = require('koa-router')()
@@ -21,4 +22,10 @@ app.use(koaLogger())
     .use(router.routes())
     .use(router.allowedMethods())
 
-app.listen(config.port, () => console.log(`starting on port ${config.port}`))
+app.listen(config.port, () => {
+  console.log(`starting on port ${config.port}`)
+  if (process.send) {
+    // started as child process, so signal that the server started
+    process.send('started')
+  }
+})

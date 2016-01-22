@@ -8,6 +8,7 @@ npm prune
 
 npm run db-reset
 npm run migrate
+npm run migrate-test
 
 psql podqueue-dev -U podqueue -f script/seed.sql
 

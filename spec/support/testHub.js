@@ -76,8 +76,8 @@ class PubSubServer {
         'hub.challenge': challenge,
         'hub.lease_seconds': leaseSeconds
       })
-    })).then(bodies => {
-      if (bodies.some(body => body !== challenge)) {
+    })).then(responses => {
+      if (responses.map(res => res.body).some(body => body !== challenge)) {
         throw new Error('challenge not satisfied')
       }
     })

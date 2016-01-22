@@ -25,6 +25,7 @@
     "watch": "nodemon",
     "watch-tests": "nodemon --exec 'npm test'",
     "migrate": "db-migrate up",
+    "migrate-test": "db-migrate up -e test",
     "migrate-down": "db-migrate down",
     "db-reset": "db-migrate reset",
     "new-migration": "db-migrate create --sql-file"
