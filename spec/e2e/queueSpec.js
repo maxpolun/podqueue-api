@@ -1,6 +1,7 @@
 'use strict'
 let test = require('./e2eSupport')
 let http = require('src/support/http')
+let User = require('src/user/user')
 
 describe('queue', () => {
   let server
@@ -9,6 +10,10 @@ describe('queue', () => {
       test.startServer(),
       test.cleanDb()
     ]).then(responses => server = responses[0])
+      .then(() => test.withDb(db => new User({
+        email: 'max@example.com',
+        username: 'max'
+      }).save(db)))
       .catch(err => expect(err).toBeUndefined())
       .then(done, done)
   })

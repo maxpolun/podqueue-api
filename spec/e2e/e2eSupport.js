@@ -7,6 +7,11 @@ const testPort = module.exports.testPort = 4004
 const testDbUrl = 'postgres://podqueue@localhost/podqueue-test'
 
 module.exports.testUrl = 'http://localhost:' + testPort
+module.exports.withDb = function (cb) {
+  return connect(testDbUrl).then(db => {
+    return cb(db.client).then(val => { db.done(); return val })
+  })
+}
 
 let query = module.exports.query = function query (q, args) {
   return connect(testDbUrl)
