@@ -29,16 +29,25 @@ router.get('/users/:username/queue', function * () {
   this.body = queue
 })
 
-let app = koa()
+router.get('/users/:username/subscriptions', function * () {
+  let user = yield User.findByUsername(this.db, this.params.username)
+  this.body = yield user.subscriptions(this.db)
+})
 
-app.use(koaLogger())
-    .use(errorMiddleware)
+let app = koa()
+if (config.logRequests) {
+  app.use(koaLogger())
+}
+
+app.use(errorMiddleware)
     .use(dbMiddleware(config.dbUrl))
     .use(router.routes())
     .use(router.allowedMethods())
 
 app.listen(config.port, () => {
-  console.log(`starting on port ${config.port}`)
+  if (config.logRequests) {
+    console.log(`starting on port ${config.port}`)
+  }
   if (process.send) {
     // started as child process, so signal that the server started
     process.send('started')

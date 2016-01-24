@@ -14,8 +14,8 @@ class Queue {
         `SELECT
           *
         FROM
-          public.episodes,
-          public.queues
+          episodes,
+          queues
         WHERE
           queues.episode_uuid = episodes.uuid AND
           queues.user_uuid = $1

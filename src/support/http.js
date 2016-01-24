@@ -10,7 +10,12 @@ function get (url, params) {
       let str = ''
       res.on('data', chunk => str += chunk.toString())
       res.on('end', () => {
-        res.body = str
+        if (/application\/json/.test(res.headers['content-type'])) {
+          res.body = JSON.parse(str)
+        } else {
+          res.body = str
+        }
+
         resolve(res)
       })
       res.on('error', err => reject(err))

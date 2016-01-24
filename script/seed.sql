@@ -37,3 +37,7 @@ VALUES
     '66f6624a-be2d-11e5-9039-3c15c2ca3dc6',
     1);
 
+INSERT INTO subscriptions (user_uuid, podcast_uuid)
+VALUES
+  ('ad5c99b6-be23-11e5-bbc6-3c15c2ca3dc6', '45eeedf2-be2c-11e5-8815-3c15c2ca3dc6');
+

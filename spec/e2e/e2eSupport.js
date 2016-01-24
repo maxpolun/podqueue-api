@@ -2,11 +2,12 @@
 let childProcess = require('child_process')
 let connect = require('src/support/db')
 let co = require('co')
+let http = require('src/support/http')
 
 const testPort = module.exports.testPort = 4004
 const testDbUrl = 'postgres://podqueue@localhost/podqueue-test'
 
-module.exports.testUrl = 'http://localhost:' + testPort
+const testUrl = module.exports.testUrl = 'http://localhost:' + testPort
 module.exports.withDb = function (cb) {
   return connect(testDbUrl).then(db => {
     return cb(db.client).then(val => { db.done(); return val })
@@ -27,6 +28,7 @@ module.exports.startServer = function () {
   return new Promise((resolve, reject) => {
     let child = childProcess.fork('index.js', [], {
       env: {
+        NODE_ENV: 'test',
         PORT: testPort,
         DATABASE_URL: testDbUrl
       }
@@ -43,9 +45,19 @@ module.exports.startServer = function () {
   })
 }
 
+module.exports.get = function (path, done, cb) {
+  http.get(testUrl + path)
+      .then(res => cb(res))
+      .catch(err => expect(err).toBeUndefined())
+      .then(done, done)
+}
+
 module.exports.cleanDb = function () {
   return co(function * () {
-    let tables = yield query(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`)
-    return yield tables.rows.map(t => query(`TRUNCATE TABLE ${t.table_name} CASCADE`))
+    let connection = yield connect(testDbUrl)
+    let tables = yield connection.client.query(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`)
+    yield tables.rows.map(t => connection.client.query(`TRUNCATE TABLE ${t.table_name} CASCADE`))
+    yield query('COMMIT')
+    return connection.done()
   })
 }
