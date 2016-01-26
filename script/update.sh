@@ -6,8 +6,6 @@ set -e
 npm install
 npm prune
 
-npm run db-reset
-npm run db-reset -- -e 'test'
 npm run migrate
 npm run migrate -- -e 'test'
 

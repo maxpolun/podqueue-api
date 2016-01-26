@@ -2,6 +2,7 @@
 let co = require('co')
 let NotFound = require('../support/errors').NotFound
 let BadRequest = require('../support/errors').BadRequest
+let AuthenticationError = require('../support/errors').AuthenticationError
 let BaseModel = require('../support/baseModel')
 let Podcast = require('../podcast/podcast')
 let pick = require('lodash/pick')
@@ -63,8 +64,8 @@ class User extends BaseModel {
 
   isAuthentic (password) {
     return new Promise((resolve, reject) => {
-      bcrypt.compare(password, this.pw_hash, (err, result) => {
-        if (err) return reject(err)
+      bcrypt.compare(password, this.pwHash, (err, result) => {
+        if (err) return reject(new AuthenticationError(err))
         resolve(result)
       })
     })

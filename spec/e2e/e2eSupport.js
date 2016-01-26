@@ -49,7 +49,7 @@ let startServer = module.exports.startServer = function () {
 module.exports.get = function (path, done, cb) {
   http.get(testUrl + path)
       .then(res => cb(res))
-      .catch(err => expect(err).toBeUndefined())
+      .catch(err => done.fail(err))
       .then(done, done)
 }
 
@@ -60,7 +60,7 @@ module.exports.post = function (path, body, done, cb) {
     }
   })
     .then(res => cb(res))
-    .catch(err => expect(err).toBeUndefined())
+    .catch(err => done.fail(err))
     .then(done, done)
 }
 

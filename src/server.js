@@ -10,8 +10,10 @@ let errorMiddleware = require('./middlewares/error')
 
 let config = require('./config/config')
 
-let User = require('./user/user.js')
-let Queue = require('./queue/queue.js')
+let User = require('./user/user')
+let Queue = require('./queue/queue')
+let Session = require('./session/session')
+let errors = require('./support/errors')
 
 require('./pubsub').listener(router)
 
@@ -36,6 +38,30 @@ router.post('/register', koaBody, function * () {
   yield user.genHash()
   yield user.save(this.db)
   this.body = user
+})
+
+function badUsernameOrPassword (ctx) {
+  ctx.status = 400
+  ctx.body = {errors: ['bad username or password']}
+}
+
+router.post('/login', koaBody, function * () {
+  try {
+    let user = yield User.findByUsername(this.db, this.request.body.username)
+    if (yield user.isAuthentic(this.request.body.password)) {
+      this.body = yield new Session({
+        userUuid: user.uuid
+      }).save(this.db)
+    } else {
+      badUsernameOrPassword(this)
+    }
+  } catch (e) {
+    if (e instanceof errors.NotFound || e instanceof errors.AuthenticationError) {
+      badUsernameOrPassword(this)
+    } else {
+      throw e
+    }
+  }
 })
 
 let app = koa()

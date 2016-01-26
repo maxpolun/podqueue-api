@@ -11,3 +11,9 @@ module.exports.BadRequest = class BadRequest extends Error {
     this.errors = errors
   }
 }
+
+module.exports.AuthenticationError = class AuthenticationError extends Error {
+  constructor () {
+    super('Bad authentication')
+  }
+}
