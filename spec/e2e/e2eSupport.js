@@ -8,6 +8,7 @@ const testPort = module.exports.testPort = 4004
 const testDbUrl = 'postgres://podqueue@localhost/podqueue-test'
 
 const testUrl = module.exports.testUrl = 'http://localhost:' + testPort
+
 module.exports.withDb = function (cb) {
   return connect(testDbUrl).then(db => {
     return cb(db.client).then(val => { db.done(); return val })
@@ -24,7 +25,7 @@ let query = module.exports.query = function query (q, args) {
           })
 }
 
-module.exports.startServer = function () {
+let startServer = module.exports.startServer = function () {
   return new Promise((resolve, reject) => {
     let child = childProcess.fork('index.js', [], {
       env: {
@@ -52,7 +53,18 @@ module.exports.get = function (path, done, cb) {
       .then(done, done)
 }
 
-module.exports.cleanDb = function () {
+module.exports.post = function (path, body, done, cb) {
+  http.post(testUrl + path, body, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => cb(res))
+    .catch(err => expect(err).toBeUndefined())
+    .then(done, done)
+}
+
+let cleanDb = module.exports.cleanDb = function () {
   return co(function * () {
     let connection = yield connect(testDbUrl)
     let tables = yield connection.client.query(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`)
@@ -60,4 +72,16 @@ module.exports.cleanDb = function () {
     yield query('COMMIT')
     return connection.done()
   })
+}
+
+module.exports.setupE2e = function () {
+  let server
+  return startServer()
+    .then(srv => server = srv)
+    .then(() => cleanDb())
+    .catch(err => {
+      if (server) server.kill()
+      expect(err.stack).toBeUndefined()
+    })
+    .then(() => server)
 }

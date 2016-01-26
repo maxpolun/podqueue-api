@@ -1,22 +1,24 @@
 'use strict'
 let co = require('co')
 let NotFound = require('../support/errors').NotFound
+let BadRequest = require('../support/errors').BadRequest
 let BaseModel = require('../support/baseModel')
 let Podcast = require('../podcast/podcast')
 let pick = require('lodash/pick')
+let bcrypt = require('bcrypt')
 
 class User extends BaseModel {
   create (db) {
     return db.query(`INSERT INTO users (
       email,
-      username
+      username,
+      pw_hash
     ) VALUES (
       $1,
-      $2
-    ) ON CONFLICT (uuid) DO UPDATE
-    SET email = EXCLUDED.email,
-        username = EXCLUDED.username
-    RETURNING *`, [this.email, this.username]).then(response => {
+      $2,
+      $3
+    )
+    RETURNING *`, [this.email, this.username, this.pw_hash]).then(response => {
       let first = response.rows[0]
       this.uuid = this.uuid || first.uuid
       return this
@@ -25,6 +27,47 @@ class User extends BaseModel {
 
   update (db) {
     return Promise.reject(new Error('not implimented'))
+  }
+
+  verify () {
+    return new Promise((resolve, reject) => {
+      let errors = []
+
+      if (errors.length === 0) {
+        resolve(this)
+      } else {
+        reject(new BadRequest(errors))
+      }
+    })
+  }
+
+  static hash (password) {
+    return new Promise((resolve, reject) => {
+      bcrypt.genSalt(10, (err, salt) => {
+        if (err) return reject(err)
+        bcrypt.hash(password, salt, (err, hashedPassword) => {
+          if (err) return reject(err)
+          resolve(hashedPassword)
+        })
+      })
+    })
+  }
+
+  genHash () {
+    return User.hash(this.password)
+      .then(hashed => {
+        this.pw_hash = hashed
+        return this
+      })
+  }
+
+  isAuthentic (password) {
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, this.pw_hash, (err, result) => {
+        if (err) return reject(err)
+        resolve(result)
+      })
+    })
   }
 
   static findByUsername (db, username) {
@@ -53,6 +96,14 @@ class User extends BaseModel {
           AND
         subscriptions.user_uuid = $1`, [this.uuid])
       .then(results => results.rows.map(row => new Podcast(pick(row, 'uuid', 'name', 'description', 'feed_url', 'hub_url', 'lease_seconds'))))
+  }
+
+  toJSON () {
+    return {
+      uuid: this.uuid,
+      username: this.username,
+      email: this.email
+    }
   }
 }
 

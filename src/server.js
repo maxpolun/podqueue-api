@@ -15,10 +15,6 @@ let Queue = require('./queue/queue.js')
 
 require('./pubsub').listener(router)
 
-router.get('/', koaBody, function * () {
-  this.body = (yield this.db.query('SELECT * FROM users')).rows
-})
-
 router.get('/users/:username', function * () {
   let user = yield User.findByUsername(this.db, this.params.username)
   this.body = user
@@ -32,6 +28,14 @@ router.get('/users/:username/queue', function * () {
 router.get('/users/:username/subscriptions', function * () {
   let user = yield User.findByUsername(this.db, this.params.username)
   this.body = yield user.subscriptions(this.db)
+})
+
+router.post('/register', koaBody, function * () {
+  let user = new User(this.request.body)
+  yield user.verify()
+  yield user.genHash()
+  yield user.save(this.db)
+  this.body = user
 })
 
 let app = koa()

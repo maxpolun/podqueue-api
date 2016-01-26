@@ -7,32 +7,35 @@ let co = require('co')
 describe('subscriptions', () => {
   let server
   beforeEach(done => {
-    test.startServer()
+    test.setupE2e()
       .then(srv => server = srv)
-      .then(() => test.cleanDb())
-      .then(() => test.withDb(co.wrap(function * (db) {
-        let user = yield new User({
-          email: 'max@example.com',
-          username: 'max'
-        }).save(db)
-        yield db.query('COMMIT')
-        let podcast = yield new Podcast({
-          name: 'test',
-          description: 'test',
-          feedUrl: 'http://feeds.example.com/testFeed'
-        }).save(db)
-        yield db.query('COMMIT')
-        return user.subscribeTo(db, podcast)
-      })))
-      .catch(err => {
-        if (server) server.kill()
-        expect(err.stack).toBeUndefined()
-      })
       .then(done, done)
   })
 
   afterEach(() => {
-    if (server) server.kill()
+    server.kill()
+  })
+
+  beforeEach(done => {
+    test.withDb(co.wrap(function * (db) {
+      let user = yield new User({
+        email: 'max@example.com',
+        username: 'max',
+        password: 'Password1'
+      }).genHash().then(u => u.save(db))
+      yield db.query('COMMIT')
+      let podcast = yield new Podcast({
+        name: 'test',
+        description: 'test',
+        feedUrl: 'http://feeds.example.com/testFeed'
+      }).save(db)
+      yield db.query('COMMIT')
+      return user.subscribeTo(db, podcast)
+    }))
+    .catch(err => {
+      expect(err).toBeUndefined()
+    })
+    .then(done, done)
   })
 
   it('can get a user\'s subscriptions', (done) => {

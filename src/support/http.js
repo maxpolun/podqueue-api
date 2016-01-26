@@ -24,8 +24,9 @@ function get (url, params) {
 }
 
 function post (url, body, options) {
-  options = options || {}
   return new Promise((resolve, reject) => {
+    options = options || {}
+    let sendBody = typeof body === 'string' ? body : JSON.stringify(body)
     let parsed = parse(url)
     let config = Object.assign({}, {
       method: 'POST'
@@ -33,10 +34,15 @@ function post (url, body, options) {
     let req = http.request(config, res => {
       res.body = ''
       res.on('data', chunk => res.body += chunk.toString())
-      res.on('end', () => resolve(req))
+      res.on('end', () => {
+        if (/json/.test(res.headers['content-type'])) {
+          res.body = JSON.parse(res.body)
+        }
+        resolve(res)
+      })
     })
     req.on('error', err => reject(err))
-    req.write(body)
+    req.write(sendBody)
     req.end()
   })
 }

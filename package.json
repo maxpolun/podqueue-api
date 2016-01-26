@@ -4,6 +4,7 @@
   "description": "The service for the podqueue.com service",
   "main": "index.js",
   "dependencies": {
+    "bcrypt": "^0.8.5",
     "camelize": "^1.0.0",
     "db-migrate": "^0.9.23",
     "feedparser": "^1.1.4",

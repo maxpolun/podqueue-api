@@ -5,22 +5,25 @@ let User = require('src/user/user')
 describe('queue', () => {
   let server
   beforeEach(done => {
-    test.startServer()
+    test.setupE2e()
       .then(srv => server = srv)
-      .then(() => test.cleanDb())
-      .then(() => test.withDb(db => new User({
-        email: 'max@example.com',
-        username: 'max'
-      }).save(db)))
-      .catch(err => {
-        if (server) server.kill()
-        expect(err.stack).toBeUndefined()
-      })
       .then(done, done)
   })
 
   afterEach(() => {
     server.kill()
+  })
+
+  beforeEach(done => {
+    test.withDb(db => new User({
+      email: 'max@example.com',
+      username: 'max',
+      password: 'Password1'
+    }).genHash().then(u => u.save(db)))
+    .catch(err => {
+      expect(err).toBeUndefined()
+    })
+    .then(done, done)
   })
 
   it('can get a user\'s queue', (done) => {
