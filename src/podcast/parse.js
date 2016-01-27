@@ -1,7 +1,7 @@
 'use strict'
 let FeedParser = require('feedparser')
 let Podcast = require('./podcast')
-let Episode = require('../episode/episode')
+let Episode = require('../episode')
 
 module.exports = function parse (inputStream) {
   return new Promise((resolve, reject) => {

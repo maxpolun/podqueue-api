@@ -12,9 +12,9 @@ let userMiddleware = require('./middlewares/user')
 
 let config = require('./config/config')
 
-let User = require('./user/user')
-let Queue = require('./queue/queue')
-let Session = require('./session/session')
+let User = require('./user')
+let Queue = require('./queue')
+let Session = require('./session')
 let errors = require('./support/errors')
 
 require('./pubsub').listener(router)

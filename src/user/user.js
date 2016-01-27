@@ -4,7 +4,7 @@ let NotFound = require('../support/errors').NotFound
 let BadRequest = require('../support/errors').BadRequest
 let AuthenticationError = require('../support/errors').AuthenticationError
 let BaseModel = require('../support/baseModel')
-let Podcast = require('../podcast/podcast')
+let Podcast = require('../podcast')
 let pick = require('lodash/pick')
 let bcrypt = require('bcrypt')
 

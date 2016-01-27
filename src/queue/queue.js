@@ -1,6 +1,6 @@
 'use strict'
 let co = require('co')
-let User = require('../user/user')
+let User = require('../user')
 
 class Queue {
   constructor (params) {

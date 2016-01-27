@@ -1,7 +1,7 @@
 'use strict'
 let parse = require('src/podcast/parse')
-let Podcast = require('src/podcast/podcast')
-let Episode = require('src/episode/episode')
+let Podcast = require('src/podcast')
+let Episode = require('src/episode')
 let fs = require('fs')
 
 function testFile (name) {

@@ -1,5 +1,5 @@
 'use strict'
-let Session = require('../session/session')
+let Session = require('../session')
 let errors = require('../support/errors')
 
 function badSession (ctx) {

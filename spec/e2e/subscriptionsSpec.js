@@ -1,8 +1,8 @@
 'use strict'
 let test = require('./e2eSupport')
-let User = require('src/user/user')
-let Podcast = require('src/podcast/podcast')
-let Session = require('src/session/session')
+let User = require('src/user')
+let Podcast = require('src/podcast')
+let Session = require('src/session')
 let co = require('co')
 
 describe('subscriptions', () => {

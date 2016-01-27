@@ -1,6 +1,6 @@
 'use strict'
 let test = require('./e2eSupport')
-let User = require('src/user/user')
+let User = require('src/user')
 
 describe('register', () => {
   let server

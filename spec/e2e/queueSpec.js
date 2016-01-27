@@ -1,7 +1,7 @@
 'use strict'
 let test = require('./e2eSupport')
-let User = require('src/user/user')
-let Session = require('src/session/session')
+let User = require('src/user')
+let Session = require('src/session')
 let co = require('co')
 
 describe('queue', () => {
