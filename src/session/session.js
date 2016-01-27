@@ -23,4 +23,16 @@ module.exports = class Session extends BaseModel {
       })
     })
   }
+
+  static findById (db, sessionId) {
+    return db.query(`SELECT * FROM sessions WHERE session_id = $1`, [sessionId])
+              .then(results => {
+                return new Session(results.rows[0])
+              })
+  }
+
+  expired () {
+    if (!this.expiresAt) return false
+    return Date.now() > this.expiresAt.getTime()
+  }
 }

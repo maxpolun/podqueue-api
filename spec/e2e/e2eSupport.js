@@ -46,8 +46,19 @@ let startServer = module.exports.startServer = function () {
   })
 }
 
-module.exports.get = function (path, done, cb) {
-  http.get(testUrl + path)
+module.exports.get = function (path, done, options, cb) {
+  if (!cb) {
+    cb = options
+  }
+  let config = {}
+
+  if (options.session) {
+    config.headers = {
+      Authorization: `Bearer ${options.session.sessionId}`
+    }
+  }
+
+  http.get(testUrl + path, {}, config)
       .then(res => cb(res))
       .catch(err => done.fail(err))
       .then(done, done)

@@ -3,23 +3,39 @@ let http = require('http')
 let querystring = require('querystring')
 let parse = require('url').parse
 
-function get (url, params) {
+function genOptions (url, defaultOpts, opts) {
+  let parsed = parse(url)
+  return Object.assign({}, defaultOpts, opts, parsed)
+}
+
+function makeRequest (config, body, onEnd, onErr) {
+  let req = http.request(config, res => {
+    let str = ''
+    res.on('data', chunk => str += chunk.toString())
+    res.on('end', () => {
+      if (/application\/json/.test(res.headers['content-type'])) {
+        res.body = JSON.parse(str)
+      } else {
+        res.body = str
+      }
+      onEnd(res)
+    })
+    res.on('error', err => onErr(err))
+  })
+  req.on('error', err => onErr(err))
+  if (body) {
+    req.write(body)
+  }
+  req.end()
+}
+
+function get (url, params, options) {
   return new Promise((resolve, reject) => {
     let query = querystring.stringify(params)
-    http.get(url + '?' + query, res => {
-      let str = ''
-      res.on('data', chunk => str += chunk.toString())
-      res.on('end', () => {
-        if (/application\/json/.test(res.headers['content-type'])) {
-          res.body = JSON.parse(str)
-        } else {
-          res.body = str
-        }
-
-        resolve(res)
-      })
-      res.on('error', err => reject(err))
-    }).on('error', err => reject(err))
+    let config = genOptions(url + '?' + query, {
+      method: 'GET'
+    }, options)
+    makeRequest(config, null, resolve, reject)
   })
 }
 
@@ -27,23 +43,10 @@ function post (url, body, options) {
   return new Promise((resolve, reject) => {
     options = options || {}
     let sendBody = typeof body === 'string' ? body : JSON.stringify(body)
-    let parsed = parse(url)
-    let config = Object.assign({}, {
+    let config = genOptions(url, {
       method: 'POST'
-    }, options, parsed)
-    let req = http.request(config, res => {
-      res.body = ''
-      res.on('data', chunk => res.body += chunk.toString())
-      res.on('end', () => {
-        if (/json/.test(res.headers['content-type'])) {
-          res.body = JSON.parse(res.body)
-        }
-        resolve(res)
-      })
-    })
-    req.on('error', err => reject(err))
-    req.write(sendBody)
-    req.end()
+    }, options)
+    makeRequest(config, sendBody, resolve, reject)
   })
 }
 

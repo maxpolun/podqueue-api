@@ -7,6 +7,8 @@ let koaBody = require('koa-body')()
 
 let dbMiddleware = require('./middlewares/db')
 let errorMiddleware = require('./middlewares/error')
+let authenticateMiddleware = require('./middlewares/authenticate')
+let userMiddleware = require('./middlewares/user')
 
 let config = require('./config/config')
 
@@ -17,12 +19,14 @@ let errors = require('./support/errors')
 
 require('./pubsub').listener(router)
 
+router.param('username', userMiddleware)
+
 router.get('/users/:username', function * () {
   let user = yield User.findByUsername(this.db, this.params.username)
   this.body = user
 })
 
-router.get('/users/:username/queue', function * () {
+router.get('/users/:username/queue', authenticateMiddleware, function * () {
   let queue = yield Queue.findByUsername(this.db, this.params.username)
   this.body = queue
 })
