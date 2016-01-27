@@ -2,10 +2,11 @@
 let test = require('./e2eSupport')
 let User = require('src/user/user')
 let Podcast = require('src/podcast/podcast')
+let Session = require('src/session/session')
 let co = require('co')
 
 describe('subscriptions', () => {
-  let server
+  let server, session
   beforeEach(done => {
     test.setupE2e()
       .then(srv => server = srv)
@@ -23,6 +24,7 @@ describe('subscriptions', () => {
         username: 'max',
         password: 'Password1'
       }).genHash().then(u => u.save(db))
+      session = yield new Session({userUuid: user.uuid}).save(db)
       yield db.query('COMMIT')
       let podcast = yield new Podcast({
         name: 'test',
@@ -39,7 +41,7 @@ describe('subscriptions', () => {
   })
 
   it('can get a user\'s subscriptions', (done) => {
-    test.get('/users/max/subscriptions', done, res => {
+    test.get('/users/max/subscriptions', done, {session}, res => {
       expect(res.statusCode).toBe(200)
       expect(res.body).toEqual([
         {

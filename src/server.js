@@ -21,7 +21,7 @@ require('./pubsub').listener(router)
 
 router.param('username', userMiddleware)
 
-router.get('/users/:username', function * () {
+router.get('/users/:username', authenticateMiddleware, function * () {
   let user = yield User.findByUsername(this.db, this.params.username)
   this.body = user
 })
@@ -31,7 +31,7 @@ router.get('/users/:username/queue', authenticateMiddleware, function * () {
   this.body = queue
 })
 
-router.get('/users/:username/subscriptions', function * () {
+router.get('/users/:username/subscriptions', authenticateMiddleware, function * () {
   let user = yield User.findByUsername(this.db, this.params.username)
   this.body = yield user.subscriptions(this.db)
 })
