@@ -1,4 +1,6 @@
 'use strict'
+let Episode = require('../episode')
+let omit = require('lodash/omit')
 
 class Queue {
   constructor (params) {
@@ -20,9 +22,16 @@ class Queue {
     .then(results => {
       return new Queue({
         user: user,
-        items: results.rows
+        items: results.rows.map(e => new Episode(omit(e, ['user_uuid', 'episode_uuid'])))
       })
     })
+  }
+
+  static push (db, user, episode) {
+    return db.query(
+      `INSERT INTO queues (user_uuid, episode_uuid, ordering)
+      VALUES ($1, $2, (SELECT COALESCE(MAX(ordering), 0) + 1 FROM queues WHERE user_uuid = $3))`,
+      [user.uuid, episode.uuid, user.uuid])
   }
 }
 

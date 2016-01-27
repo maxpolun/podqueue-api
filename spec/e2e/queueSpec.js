@@ -2,6 +2,9 @@
 let test = require('./e2eSupport')
 let User = require('src/user')
 let Session = require('src/session')
+let Podcast = require('src/podcast')
+let Episode = require('src/episode')
+let Queue = require('src/queue')
 let co = require('co')
 
 describe('queue', () => {
@@ -16,13 +19,32 @@ describe('queue', () => {
     server.kill()
   })
 
-  let user
+  let user, episode, podcast
   beforeEach(done => {
-    test.withDb(db => new User({
-      email: 'max@example.com',
-      username: 'max',
-      password: 'Password1'
-    }).genHash().then(u => u.save(db)).then(u => user = u))
+    test.withDb(co.wrap(function *(db) {
+      user = yield new User({
+        email: 'max@example.com',
+        username: 'max',
+        password: 'Password1'
+      }).genHash().then(u => u.save(db))
+      podcast = yield new Podcast({
+        name: 'test',
+        description: 'test',
+        feedUrl: 'http://feeds.example.com/testFeed'
+      }).save(db)
+      episode = yield new Episode({
+        podcastUuid: podcast.uuid,
+        name: 'ep1',
+        description: 'episode 1',
+        releasedAt: new Date(),
+        authorGuid: '12345',
+        fileUrl: 'http://cdn.example.com/podcasts/test/ep1.mp3',
+        fileFormat: 'audio/mpeg',
+        fileLength: 12345,
+        fileDuration: '5:45'
+      }).save(db)
+      yield Queue.push(db, user, episode)
+    }))
     .catch(err => {
       done.fail(err)
     })
@@ -60,9 +82,25 @@ describe('queue', () => {
         .then(done, done)
     })
 
-    it('can get a user\'s queue', (done) => {
+    it('can get a user\'s queue', done => {
       test.get('/users/max/queue', done, { session }, res => {
         expect(res.statusCode).toBe(200)
+        expect(res.body).toEqual({
+          user: { uuid: user.uuid, username: user.username, email: user.email },
+          items: [{
+            podcastUuid: podcast.uuid,
+            uuid: episode.uuid,
+            name: 'ep1',
+            description: 'episode 1',
+            releasedAt: episode.releasedAt.toISOString(),
+            authorGuid: '12345',
+            fileUrl: 'http://cdn.example.com/podcasts/test/ep1.mp3',
+            fileFormat: 'audio/mpeg',
+            fileLength: '12345',
+            fileDuration: '5:45',
+            ordering: '1'
+          }]
+        })
       })
     })
   })
