@@ -25,13 +25,11 @@ describe('subscriptions', () => {
         password: 'Password1'
       }).genHash().then(u => u.save(db))
       session = yield new Session({userUuid: user.uuid}).save(db)
-      yield db.query('COMMIT')
       let podcast = yield new Podcast({
         name: 'test',
         description: 'test',
         feedUrl: 'http://feeds.example.com/testFeed'
       }).save(db)
-      yield db.query('COMMIT')
       return user.subscribeTo(db, podcast)
     }))
     .catch(err => {

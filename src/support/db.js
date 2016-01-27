@@ -15,7 +15,8 @@ class PgClient {
       this._client.query(queryStr, params || [], (err, result) => {
         let timeDiff = Date.now() - startTime
         if (timeDiff >= config.longQueryTimeout) {
-          console.log('query took', timeDiff, 'ms. Query:', queryStr, 'with params', params)
+          let paramsStr = params ? `with params ${params}` : ''
+          console.log('query took', timeDiff, 'ms. Query:', queryStr, paramsStr)
         }
         if (err) return reject(err)
         resolve(result)
