@@ -27,7 +27,7 @@ router.get('/users/:username', authenticateMiddleware, function * () {
 })
 
 router.get('/users/:username/queue', authenticateMiddleware, function * () {
-  let queue = yield Queue.findByUsername(this.db, this.params.username)
+  let queue = yield Queue.findByUser(this.db, this.user)
   this.body = queue
 })
 
