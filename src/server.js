@@ -13,6 +13,7 @@ let userMiddleware = require('./middlewares/user')
 let config = require('./config/config')
 
 let User = require('./user')
+let Podcast = require('./podcast')
 let Queue = require('./queue')
 let Session = require('./session')
 let errors = require('./support/errors')
@@ -22,8 +23,7 @@ require('./pubsub').listener(router)
 router.param('username', userMiddleware)
 
 router.get('/users/:username', authenticateMiddleware, function * () {
-  let user = yield User.findByUsername(this.db, this.params.username)
-  this.body = user
+  this.body = this.user
 })
 
 router.get('/users/:username/queue', authenticateMiddleware, function * () {
@@ -32,8 +32,12 @@ router.get('/users/:username/queue', authenticateMiddleware, function * () {
 })
 
 router.get('/users/:username/subscriptions', authenticateMiddleware, function * () {
-  let user = yield User.findByUsername(this.db, this.params.username)
-  this.body = yield user.subscriptions(this.db)
+  this.body = yield this.user.subscriptions(this.db)
+})
+
+router.post('/users/:username/subscriptions', koaBody, authenticateMiddleware, function * () {
+  yield this.user.subscribeTo(this.db, new Podcast({uuid: this.request.body.podcastUuid}))
+  this.status = 201
 })
 
 router.post('/register', koaBody, function * () {

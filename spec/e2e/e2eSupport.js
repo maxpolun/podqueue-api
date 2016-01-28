@@ -64,12 +64,20 @@ module.exports.get = function (path, done, options, cb) {
       .then(done, done)
 }
 
-module.exports.post = function (path, body, done, cb) {
-  http.post(testUrl + path, body, {
+module.exports.post = function (path, body, done, options, cb) {
+  if (!cb) {
+    cb = options
+    options = {}
+  }
+  let config = {
     headers: {
       'Content-Type': 'application/json'
     }
-  })
+  }
+  if (options.session) {
+    config.headers.Authorization = `Bearer ${options.session.sessionId}`
+  }
+  http.post(testUrl + path, body, config)
     .then(res => cb(res))
     .catch(err => done.fail(err))
     .then(done, done)
