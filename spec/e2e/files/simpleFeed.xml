@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"  version="2.0">
+  <channel>
+    <title>Test Feed</title>
+    <link>http://thehistoryofrome.typepad.com/the_history_of_rome/</link>
+    <language>en</language>
+    <copyright>2015</copyright>
+    <itunes:summary>A simple test feed</itunes:summary>
+    <description>A simple test feed</description>
+    <itunes:new-feed-url>'http://localhost:4007/feeds/simpleFeed.xml'</itunes:new-feed-url>
+    <atom:link rel="self" type="application/rss+xml" href="'http://localhost:4007/feeds/simpleFeed.xml'" />
+    <item>
+      <title>Episode 1</title>
+      <pubDate>Sat, 28 Jul 2007 00:47:00 +0000</pubDate>
+      <guid isPermaLink="false"><![CDATA[8e0e6a7a-c5b8-11e5-99a8-3c15c2ca3dc6]]></guid>
+      <description>The first episode of a test podcast</description>
+      <itunes:duration>1:23</itunes:duration>
+      <itunes:subtitle>The first episode of a test podcast</itunes:subtitle>
+      <author>max@example.com (Max Example)</author>
+      <media:content
+        url="http://localhost:4007/feeds/simpleFeed-episode1.mp3" fileSize="12345" type="audio/mpeg" />
+      <itunes:author>Max Example</itunes:author>
+      <itunes:summary>The first episode of a test podcast</itunes:summary>
+      <enclosure
+        url="http://localhost:4007/feeds/simpleFeed-episode1.mp3" length="12345" type="audio/mpeg" />
+    </item>
+  </channel>
+</rss>

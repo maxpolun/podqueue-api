@@ -1,5 +1,6 @@
 'use strict'
 let BaseModel = require('../support/baseModel')
+let uniq = require('lodash/uniq')
 
 class Podcast extends BaseModel {
   create (db) {
@@ -30,13 +31,44 @@ class Podcast extends BaseModel {
 }
 
 function parseLinkTags (feedJson) {
-  let tags = feedJson['atom10:link']
+  let namespaces = findNs(feedJson, 'http://www.w3.org/2005/Atom')
+  let tags = findAllTags(feedJson, namespaces, 'link')
   let link = {}
 
-  tags.map(tag => tag['@']).forEach(tag => {
-    link[tag.rel] = tag.href
-  })
+  if (tags) {
+    tags.map(tag => tag['@']).forEach(tag => {
+      link[tag.rel] = tag.href.replace(/'/g, '')
+    })
+  }
+
   return link
+}
+
+function toPair (obj) {
+  let key = Object.keys(obj)[0]
+  return [key, obj[key]]
+}
+
+function findNs (feedJson, url) {
+  return uniq(feedJson['#ns']
+            .map(toPair)
+            .filter(pair => pair[1] === url)
+            .map(pair => pair[0].replace('xmlns:', '')))
+}
+
+function findAllTags (feedJson, namespaces, tagname) {
+  let tags = []
+  namespaces.forEach(ns => {
+    let tag = feedJson[ns + ':' + tagname]
+    if (tag) {
+      if (tag instanceof Array) {
+        tags = tags.concat(tag)
+      } else {
+        tags.push(tag)
+      }
+    }
+  })
+  return tags
 }
 
 module.exports = Podcast

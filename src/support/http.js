@@ -8,8 +8,10 @@ function genOptions (url, defaultOpts, opts) {
   return Object.assign({}, defaultOpts, opts, parsed)
 }
 
-function makeRequest (config, body, onEnd, onErr) {
+function makeRequest (config, body, onEnd, onErr, options) {
+  options = options || {}
   let req = http.request(config, res => {
+    if (options.raw) return onEnd(res)
     let str = ''
     res.on('data', chunk => str += chunk.toString())
     res.on('end', () => {
@@ -31,11 +33,15 @@ function makeRequest (config, body, onEnd, onErr) {
 
 function get (url, params, options) {
   return new Promise((resolve, reject) => {
+    if (!params) params = {}
+    if (!options) options = {}
     let query = querystring.stringify(params)
     let config = genOptions(url + '?' + query, {
       method: 'GET'
     }, options)
-    makeRequest(config, null, resolve, reject)
+    makeRequest(config, null, resolve, reject, {
+      raw: options.raw || false
+    })
   })
 }
 

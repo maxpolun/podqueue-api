@@ -17,6 +17,9 @@ let Podcast = require('./podcast')
 let Queue = require('./queue')
 let Session = require('./session')
 let errors = require('./support/errors')
+let http = require('./support/http')
+
+let parseFeed = require('./podcast/parse')
 
 require('./pubsub').listener(router)
 
@@ -38,6 +41,13 @@ router.get('/users/:username/subscriptions', authenticateMiddleware, function * 
 router.post('/users/:username/subscriptions', koaBody, authenticateMiddleware, function * () {
   yield this.user.subscribeTo(this.db, new Podcast({uuid: this.request.body.podcastUuid}))
   this.status = 201
+})
+
+router.post('/import/podcast', koaBody, function * () {
+  let res = yield http.get(this.request.body.feedUrl, {}, {raw: true})
+  let feed = yield parseFeed(res)
+  yield feed.meta.save(this.db)
+  this.body = feed.meta
 })
 
 router.post('/register', koaBody, function * () {
