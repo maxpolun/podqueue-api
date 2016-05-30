@@ -9,6 +9,7 @@ let dbMiddleware = require('./middlewares/db')
 let errorMiddleware = require('./middlewares/error')
 let authenticateMiddleware = require('./middlewares/authenticate')
 let userMiddleware = require('./middlewares/user')
+let corsMiddleware = require('./middlewares/cors')
 
 let config = require('./config/config')
 
@@ -67,15 +68,16 @@ router.post('/login', koaBody, function * () {
   try {
     let user = yield User.findByUsername(this.db, this.request.body.username)
     if (yield user.isAuthentic(this.request.body.password)) {
-      this.body = yield new Session({
+      let session = yield new Session({
         userUuid: user.uuid
       }).save(this.db)
+      this.body = session
     } else {
-      badUsernameOrPassword(this)
+      return badUsernameOrPassword(this)
     }
   } catch (e) {
     if (e instanceof errors.NotFound || e instanceof errors.AuthenticationError) {
-      badUsernameOrPassword(this)
+      return badUsernameOrPassword(this)
     } else {
       throw e
     }
@@ -88,6 +90,7 @@ if (config.logRequests) {
 }
 
 app.use(errorMiddleware)
+    .use(corsMiddleware)
     .use(dbMiddleware(config.dbUrl))
     .use(router.routes())
     .use(router.allowedMethods())
